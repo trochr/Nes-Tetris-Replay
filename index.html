@@ -1,0 +1,97 @@
+<html>
+    <header>
+        <title>
+            NES Tetris Replay
+        </title>
+        <script src="script.js"></script>
+        <link rel="stylesheet" href="style.css"> 
+
+    </header>
+    <body>
+        <div id="wrap">
+            <div id="main">
+                <canvas id="field" width="100" height="200"></canvas>
+                <canvas id="fieldTemp" width="100" height="200"></canvas>
+            </div>
+            <div id="right">
+                <canvas id="nextPiece" width="32" height="32"></canvas>
+                <div id="status">Game paused</div>
+                <div>Level : <span id="level">0</span></div>
+                <div>Lines : <span id="linesCount">0</span></div>
+                <div>Score : <span id="score">0</span></div>
+                <div>I drought : <span id="idrought">0</span></div>        
+                <div>
+                    Soft-Drop &lt; L14
+                    <input id="softDrop" type="checkbox" checked="true">
+                </div>
+                <div class="slidecontainer">
+                    Replay speed <label id="currentSpeed">10</label>x<br/>
+                    <input type="range" min="1" max="20" value="10" class="slider" id="speedSlider">
+                </div>       
+            </div>
+        </div>
+        <div id="palette">
+            <canvas class="square" id="squareH" width="7" height="7"></canvas>
+            <canvas class="square" id="squareF" width="7" height="7"></canvas>
+            <canvas class="square" id="squareF2" width="7" height="7"></canvas>
+            <canvas class="square" id="squareB" width="7" height="7"></canvas>
+
+            <canvas class="piece" id="Sh" width="40" height="40"></canvas>
+            <canvas class="piece" id="Sv" width="40" height="40"></canvas>
+
+            <canvas class="piece" id="Zh" width="40" height="40"></canvas>
+            <canvas class="piece" id="Zv" width="40" height="40"></canvas>
+
+            <canvas class="piece" id="On" width="40" height="40"></canvas>
+
+            <canvas class="piece" id="Jd" width="40" height="40"></canvas>
+            <canvas class="piece" id="Jl" width="40" height="40"></canvas>
+            <canvas class="piece" id="Ju" width="40" height="40"></canvas>
+            <canvas class="piece" id="Jr" width="40" height="40"></canvas>
+
+            <canvas class="piece" id="Ld" width="40" height="40"></canvas>
+            <canvas class="piece" id="Ll" width="40" height="40"></canvas>
+            <canvas class="piece" id="Lu" width="40" height="40"></canvas>
+            <canvas class="piece" id="Lr" width="40" height="40"></canvas>
+
+            <canvas class="piece" id="Td" width="40" height="40"></canvas>
+            <canvas class="piece" id="Tl" width="40" height="40"></canvas>
+            <canvas class="piece" id="Tu" width="40" height="40"></canvas>
+            <canvas class="piece" id="Tr" width="40" height="40"></canvas>
+
+            <canvas class="piece" id="Iv" width="40" height="40"></canvas>
+            <canvas class="piece" id="Ih" width="40" height="40"></canvas>
+
+
+            <!-- Now the black pieces to earse -->
+            <canvas class="piece" id="ShB" width="40" height="40"></canvas>
+            <canvas class="piece" id="SvB" width="40" height="40"></canvas>
+
+            <canvas class="piece" id="ZhB" width="40" height="40"></canvas>
+            <canvas class="piece" id="ZvB" width="40" height="40"></canvas>
+
+            <canvas class="piece" id="OnB" width="40" height="40"></canvas>
+
+            <canvas class="piece" id="JdB" width="40" height="40"></canvas>
+            <canvas class="piece" id="JlB" width="40" height="40"></canvas>
+            <canvas class="piece" id="JuB" width="40" height="40"></canvas>
+            <canvas class="piece" id="JrB" width="40" height="40"></canvas>
+
+            <canvas class="piece" id="LdB" width="40" height="40"></canvas>
+            <canvas class="piece" id="LlB" width="40" height="40"></canvas>
+            <canvas class="piece" id="LuB" width="40" height="40"></canvas>
+            <canvas class="piece" id="LrB" width="40" height="40"></canvas>
+
+            <canvas class="piece" id="TdB" width="40" height="40"></canvas>
+            <canvas class="piece" id="TlB" width="40" height="40"></canvas>
+            <canvas class="piece" id="TuB" width="40" height="40"></canvas>
+            <canvas class="piece" id="TrB" width="40" height="40"></canvas>
+
+            <canvas class="piece" id="IvB" width="40" height="40"></canvas>
+            <canvas class="piece" id="IhB" width="40" height="40"></canvas>
+
+            <canvas id="endingLine" width="80" height="7"></canvas>
+
+        </div>
+    </body>
+</html>

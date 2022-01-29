@@ -1,0 +1,65 @@
+body {
+    background-color: rgb(12, 0, 54);
+    color: white;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: small;
+}
+  
+#status {
+    visibility: hidden;
+}
+
+h1 {
+color: rgb(36, 36, 134);
+margin-left: 20px;
+}
+
+#field {
+    float: left;
+    width: 100%;
+}
+
+#fieldTemp {
+    visibility:hidden;
+    width: 0%;
+    height: 0%;
+}
+
+#palette {
+    visibility:hidden;
+}
+
+#nextPiece {
+    background-color: black;
+}
+canvas {
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-crisp-edges;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+.piece {
+    border: 1px solid rgb(64, 71, 0); 
+}
+
+#wrap {
+    width: 316px;
+    height: 362px;
+}
+
+#main {
+    width: 180px;
+    height: 290px;
+    float: left;
+}
+
+#right {
+    float: left;
+    width: 130px;
+    height: 100%;
+}
+
+#nextPiece {
+    width: 40%;
+}
