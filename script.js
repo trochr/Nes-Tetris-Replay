@@ -21,10 +21,10 @@ Features:
 + display the end screen
 + zoom level (auto and manual) just put a % slider for #field width
 + show next piece
++ host that on github
 save games (in localStorage)
 have all this settings an a NES style interface
 add stats : Tetris Rate
-host that on github
 compute and show game time
 menu selection bip
 show the game at a certain : frame/percentage/time, thanks to a URL parameter
@@ -50,6 +50,21 @@ correct the level formula, it is wrong about 100 or so...
 stop these transparent pieces, and deal with pathfinding (hard!)
 Fix this weird unreachable round 60 FPS
 */
+
+/* Sample game
+
+https://trochr.github.io/Nes-Tetris-Replay/?sl=14&r=eckksZlCEXlAYxKLUiB4KN4me4Gsh7zapXAFaHbAUqmUUgJ3qmUUkNHvRgzSxDvMkQAAAA=
+
+sl=14&r=eckksZlCEXlAYxKLUiB4KN4me4Gsh7zapXAFaHbAUqmUUgJ3qmUUkNHvRgzSxDvMkQAAAA=
+
+we need a unique Id of the replay, it should be a UUID, derived from the sl / r value
+
+let's compute a sha256 of it !
+
+*/
+
+
+
 
 var colors=[[[32,56,236],  [59,188,252]]  // 0
            ,[[0,168,0],    [128,208,16]]  // 1
@@ -80,7 +95,44 @@ window.onload = function() {
     document.querySelector("#softDrop").onclick = toggleSoftDrop;
     document.querySelector("#speedSlider").oninput = changeSpeed;
     tetrisGame(getSequenceFromUrl())
+    if (localStorage.getItem("ntr")  == undefined ) {
+        initLocalStorage()
+    }
 
+    saveGame()
+}
+
+async function saveGame() {
+    params=window.location.search.split("?")[1]
+    console.log("Will save: "+params)
+    sha = await sha256(params);
+    replayUUID = sha.slice(0,8)+"-"+sha.slice(8,12)+"-"+sha.slice(12,16)
+        +"-"+sha.slice(16,20)+"-"+sha.slice(20,32)
+    console.log(replayUUID);
+    // check if is present in localStorage
+
+    // add to localStorage
+
+    // init LocalStorage if empty
+
+}
+
+function initLocalStorage () {
+    localStorage.setItem("ntr",12)
+}
+  
+async function sha256(text) {
+
+    async function digestMessage(message) {
+    const msgUint8 = new TextEncoder().encode(message);                           // encode comme (utf-8) Uint8Array
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);           // fait le condensé
+    const hashArray = Array.from(new Uint8Array(hashBuffer));                     // convertit le buffer en tableau d'octet
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join(''); // convertit le tableau en chaîne hexadélimale
+    return hashHex;
+    }
+
+    const digestHex = await digestMessage(text);
+    return digestHex;
 }
 
 function dec2bin(dec) {

@@ -2,4 +2,4 @@ Replay some sweet NES tetris
 
 Example:
 
-https://trochr.github.io/Nes-Tetris-Replay/?sl=14&r=eckksZlCEXlAYxKLUiB4KN4me4Gsh7zapXAFaHbAUqmUUgJ3qmUUkNHvRgzSxDvMkQAAAA=
+https://trochr.github.io/Nes-Tetris-Replay/?sl=18&r=KSwklJgCBgbF5lKAxa1IKWKUed4xVx4i1nHNwoe03AZ0CYoVuVsEYBVIhzIccnMmUWiOJKODVesYqGEAdE3MiCmaplkhxBcEVKmUSgJIPVwyckmLeMQYmIMBkVcwmDRz2YNVJiAEYSYPeEYg0XhN5neEGpdrFak2uRgGUqZRZiiekHhh6IcoXNhimWkVtZITapGvRZ5lEnBRqJg8IxV45k8IhmJCkU4giJAil4qCESiknrFyWi6YjeEocx3NZxAY1JRd6maRVMU6lK1RRAAAAA=
