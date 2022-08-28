@@ -22,7 +22,7 @@ Features:
 + zoom level (auto and manual) just put a % slider for #field width
 + show next piece
 + host that on github
-Size correctly on iPhone
++ Size correctly on iPhone
 Compute the final game stat on start
 save games (in localStorage), record date/time
 have all this settings an a NES style interface
@@ -59,7 +59,7 @@ Issues to fix:
 + tidy the divs 
 + the next piece doesn't appear on first piece
 + very long breaks are happening, unclear when and why
-fix the speed issue
++ fix the speed issue
 slow down the clear line animation
 interrupt sound playing to avoid piling in fast replays, delays
 On same topic there is a discrepancy beteen Chrome & Safara
@@ -110,7 +110,6 @@ window.onload = function() {
     window.gamePaused = false;
     buildShapes()
     document.querySelector("#main").onclick = togglePauseGameReplay;
-    document.querySelector("#softDrop").onclick = toggleSoftDrop;
     document.querySelector("#speedSlider").oninput = changeSpeed;
     tetrisGame(getSequenceFromUrl())
     if (localStorage.getItem("ntr")  == undefined ) {
@@ -577,16 +576,24 @@ function draw(game){
         ctxTemp.fillRect(0, 0, 10*8,20*8);
     } else {
         if (game.level < 9) {
-            game.animation.levelSpeed=48-(5*game.level)
+            game.animation.levelSpeed=48-(5*game.level) // don't understand that anymore...
         } else if (game.level == 9) {
             game.animation.levelSpeed=6
+        } else if (game.level < 15) {
+            game.animation.levelSpeed=5
+        } else if (game.level < 16) {
+            game.animation.levelSpeed=4
+        } else if (game.level < 19) {
+            game.animation.levelSpeed=3
+        } else if (game.level < 29) {
+            game.animation.levelSpeed=2
         } else {
-            game.animation.levelSpeed-=1
+            game.animation.levelSpeed=1
         }
         if (game.softDrop 
             && game.animation.rotationDone
             && game.animation.alignementDone) {
-            game.animation.levelSpeed=2
+            game.animation.levelSpeed=1
             // Soft drop = 1/2G 1G : 1 frame per 
         }
         gals=Math.floor(game.animation.levelSpeed/=game.animation.speedFactor)
@@ -768,7 +775,10 @@ function tetrisGame(gameDecoded){
     game.frame = 0;
     game.soundOff = true;
     game.sounds = initSounds(game)
-    game.softDrop = true
+    game.softDrop = (game.level < 14) ? true : false
+    if (!game.softDrop) {
+        document.querySelector("#softDrop").checked = false
+    }
     t=window.performance.now()
     game.prevTime=t
     game.idrought=0
