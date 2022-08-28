@@ -22,12 +22,29 @@ Features:
 + zoom level (auto and manual) just put a % slider for #field width
 + show next piece
 + host that on github
-save games (in localStorage)
+Size correctly on iPhone
+Compute the final game stat on start
+save games (in localStorage), record date/time
 have all this settings an a NES style interface
 add stats : Tetris Rate
 compute and show game time
-menu selection bip
+menu selection beep
 show the game at a certain : frame/percentage/time, thanks to a URL parameter
+Display a overview of all the games recorded in the localStorage
+Tag games of special interst
+allow comments on the games (use something like disqus or alternatives : yt/K0WJRApcKCA)
+can publish a game 
+stats and other stuff to analyze:
+- t parity correlation, on best games (mine, bot)
+- highest drill down
+- best 4 lines sequences
+- rate of good games (aGameScout)
+- highest tetris
+- latest tetris (by line, by score)
+- best I shortage survival
+- Biggest scattered stack drillage 
+- RNG kindness 
+- T spins
 
 Issues to fix:
 + the start of the game is trash
@@ -47,8 +64,9 @@ slow down the clear line animation
 interrupt sound playing to avoid piling in fast replays, delays
 On same topic there is a discrepancy beteen Chrome & Safara
 correct the level formula, it is wrong about 100 or so...
-stop these transparent pieces, and deal with pathfinding (hard!)
-Fix this weird unreachable round 60 FPS
+stop these transparent pieces, and deal with pathfinding (hard!).
+> Turns out, there is a smarter way (where is the piece on the row above ? position / slide +/- 1) also consider low lever multi tuck
+Fix this weird unreachable round 60 FPS (who cares ?)
 */
 
 /* Sample game
