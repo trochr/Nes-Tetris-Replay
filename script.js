@@ -60,24 +60,53 @@ Issues to fix:
 + the next piece doesn't appear on first piece
 + very long breaks are happening, unclear when and why
 + fix the speed issue
-slow down the clear line animation
++ slow down the clear line animation
 interrupt sound playing to avoid piling in fast replays, delays
-On same topic there is a discrepancy beteen Chrome & Safara
+On same topic there is a discrepancy between Chrome & Safari
 correct the level formula, it is wrong about 100 or so...
 stop these transparent pieces, and deal with pathfinding (hard!).
 > Turns out, there is a smarter way (where is the piece on the row above ? position / slide +/- 1) also consider low lever multi tuck
 Fix this weird unreachable round 60 FPS (who cares ?)
+Speed seems funky on levels below 13
 */
 
-/* Sample game
-
-https://trochr.github.io/Nes-Tetris-Replay/?sl=14&r=eckksZlCEXlAYxKLUiB4KN4me4Gsh7zapXAFaHbAUqmUUgJ3qmUUkNHvRgzSxDvMkQAAAA=
-
+/* Test games
+With 2 tetris:
 sl=14&r=eckksZlCEXlAYxKLUiB4KN4me4Gsh7zapXAFaHbAUqmUUgJ3qmUUkNHvRgzSxDvMkQAAAA=
 
-we need a unique Id of the replay, it should be a UUID, derived from the sl / r value
+Single tuck
+?sl=18&r=OQVks3qJrSUkkBMxkglWmQjFEEA
 
+Multilpe tuck
+?sl=0&r=iTJeppHlqoWGUKgyWg12qWcmWNkRYj1CoAAAAA=
+
+T-spin
+?sl=18&r=mShkppwiCghGHJOZVkhIKRyRiEWqJ4lWtkmYzGG1UqUIgAA
+
+Any spin
+...
+
+
+Scratch
+=====
+
+Some god times here:
+https://meatfighter.com/nintendotetrisai/
+
+Save games in localStorage
+------
+we need a unique Id of the replay, it should be a UUID, derived from the sl / r value
 let's compute a sha256 of it !
+
+Straigh drops
+-------
+
+How to define a straigh drop : a piece can be placed easily, no tuck, no spin
+
+this happens when all the cells vertically over the final position are clear
+else, we have a notstraightdrop, and in this case we need to look for the closest straightdrop
+- without spin
+- with spin
 
 */
 
@@ -445,15 +474,14 @@ function placeShape(shape,posX, posY) {
     ctx.drawImage(canvaPiece,posX*8,posY*8);
 }
 
-function clearLines(shape,row)
+function clearLines(game,shape,row)
 {
     // TODO : check only lines where the shape was placed
 
     // check center share of each cube, searching for a line
     // with no black pixels
-
     var canvas = document.querySelector('#field')
-    var ctx = canvas.getContext("2d");
+    var ctx = canvas.getContext("2d")
     var linesToClear=[]
     for (var i=0;i<canvas.height; i+=8) {
         var empty=-3;
@@ -468,31 +496,8 @@ function clearLines(shape,row)
             linesToClear.push((i/8)+1)
         }
     }
-    // clear animation from the middle, on each line
-    ctx.fillStyle = 'black';
-    for (var i=1; i <= 5 ; i++) {
-        linesToClear.forEach(function(e,h,n){
-            ctx.fillRect(5*8-(i*8),(e-1)*8,(i*8*2),8)
-        })    
-    }
 
-    // Drop what is suspended to the ground 
-    // Could do that without the temp canvas
-    // but too much headache at this point
-    var canvasTemp = document.querySelector('#fieldTemp')
-    var ctxTemp = canvasTemp.getContext("2d");
-
-    for (var i= 0 ; i < linesToClear.length ; i++) {
-        sw = canvasTemp.width;
-        sh = linesToClear[i]*8;
-        dw = sw;
-        dh = canvasTemp.height - 8;
-        ctxTemp.fillRect(0,0,10*8,20*8);
-        ctxTemp.drawImage(canvas,0, 0, sw, sh, 0, 8, dw, sh);
-        ctx.fillRect(0,0,10*8,sh);
-        ctx.drawImage(ctxTemp.canvas,0,0,10*8,sh,0,0,10*8,sh);
-    }
-    return (linesToClear.length)
+    return (linesToClear)
 }
 
 function updateLevelLinesAndScore(count) {
@@ -561,6 +566,44 @@ function draw(game){
     }
     if (window.game.paused == true) {
         return;
+    } else if (game.lineClearInProgress) {
+        var canvas = document.querySelector('#field')
+        var ctx = canvas.getContext("2d")
+    
+        console.log("Game is playing clear line animation")       
+        if (game.linesToClear.length > 0) {
+            // clear animation from the middle, on each line
+            ctx.fillStyle = 'black';
+            lcs=game.linesClearStep
+            for (j = 0; j < game.linesToClear.length; j++) {
+                ctx.fillRect(5*8-(lcs*8),(game.linesToClear[j]-1)*8,(lcs*8*2),8)
+            }
+            game.animation.cleaAnimStep+=1
+            if (game.animation.cleaAnimStep == 3) {
+                game.linesClearStep+=1
+                game.animation.cleaAnimStep=0
+            }
+            console.log("lcs is at: "+game.linesClearStep)
+            if (game.linesClearStep == 5) {
+                // What is suspended shall drop to the ground 
+                var canvasTemp = document.querySelector('#fieldTemp')
+                var ctxTemp = canvasTemp.getContext("2d");
+                for (var i= 0 ; i < game.linesToClear.length ; i++) {
+                    sw = canvasTemp.width;
+                    sh = game.linesToClear[i]*8;
+                    dw = sw;
+                    dh = canvasTemp.height - 8;
+                    ctxTemp.fillRect(0,0,10*8,20*8);
+                    ctxTemp.drawImage(canvas,0, 0, sw, sh, 0, 8, dw, sh);
+                    ctx.fillRect(0,0,10*8,sh);
+                    ctx.drawImage(ctxTemp.canvas,0,0,10*8,sh,0,0,10*8,sh);
+                    copyTemp()
+                }
+                game.lineClearInProgress = false;
+                game.linesClearStep = 0
+            } 
+        }
+        return
     } else if (game.animation.frame == 1) { 
         // draw Field only on first frame
         var canvas = document.querySelector('#field')
@@ -576,7 +619,7 @@ function draw(game){
         ctxTemp.fillRect(0, 0, 10*8,20*8);
     } else {
         if (game.level < 9) {
-            game.animation.levelSpeed=48-(5*game.level) // don't understand that anymore...
+            game.animation.levelSpeed=48-(5*game.level) // see meatfighter
         } else if (game.level == 9) {
             game.animation.levelSpeed=6
         } else if (game.level < 15) {
@@ -689,7 +732,12 @@ function draw(game){
                 if (!game.soundOff) {
                     game.sounds["land"].play()
                 }
-                c=clearLines(game.lastPiece.shape,game.lastPiece.row)
+                game.linesToClear=clearLines(game,game.lastPiece.shape,game.lastPiece.row)
+                c=game.linesToClear.length
+                if (c>0) {
+                    game.lineClearInProgress = true
+                    game.linesClearStep = 0
+                }
                 updateLevelLinesAndScore(c);
                 game.lastPiece={shape:step.shape,column:step.column
                                 ,row:step.row+1};
@@ -782,11 +830,13 @@ function tetrisGame(gameDecoded){
     t=window.performance.now()
     game.prevTime=t
     game.idrought=0
+    game.linesToClear=[]
     game.lastPiece = game.frames[0];
 
     game.animation = {frame:0,frameX: 2, frameY: -3
                     ,rotation:0,rotationDone:false,speedFactor:1
-                    ,alignementDone:false,levelSpeed:48}
+                    ,alignementDone:false,levelSpeed:48,lineClearInProgress:false,
+                    cleaAnimStep:0}
     changeSpeed()
     // game runs at 60.0988 FPS on NTSC NES, need to adjust that later
     if (!game.soundOff) {
