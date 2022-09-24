@@ -23,8 +23,8 @@ Features:
 + show next piece
 + host that on github
 + Size correctly on iPhone
++ save games (in localStorage), record date/time
 Compute the final game stat on start
-save games (in localStorage), record date/time
 have all this settings an a NES style interface
 add stats : Tetris Rate
 compute and show game time
@@ -61,11 +61,11 @@ Issues to fix:
 + very long breaks are happening, unclear when and why
 + fix the speed issue
 + slow down the clear line animation
+Stop these transparent pieces, and deal with pathfinding (hard!).
+> Turns out, there is a smarter way (where is the piece on the row above ? position / slide +/- 1) also consider low lever multi tuck
 interrupt sound playing to avoid piling in fast replays, delays
 On same topic there is a discrepancy between Chrome & Safari
 correct the level formula, it is wrong about 100 or so...
-stop these transparent pieces, and deal with pathfinding (hard!).
-> Turns out, there is a smarter way (where is the piece on the row above ? position / slide +/- 1) also consider low lever multi tuck
 Fix this weird unreachable round 60 FPS (who cares ?)
 Speed seems funky on levels below 13
 */
@@ -82,6 +82,16 @@ Multilpe tuck
 
 T-spin
 ?sl=18&r=mShkppwiCghGHJOZVkhIKRyRiEWqJ4lWtkmYzGG1UqUIgAA
+
+This very long game has a false score (239020):
+https://trochr.github.io/Nes-Tetris-Replay/?sl=18&r=OYBksYuWSGkxYKiUWgwXqKDEeV3IFxUa0mgZoJlEXqiMRaoVvJ7CY1HDd5lelFqVqVW+ZRNq1ayIKJiZg8WqRhnel2jlz2cEnJVgVUwIRRoxfE1pl6gdEWshyiWmXRJSQWaGqdxUY2GnhkmW4WmlpBa42od0ga1nSdpxcxXjh5zeIXKN4GhEXKWBjeyIEFijax3JJ8WaEVnFLJlFHsNoZg93pWBpg8HxV8CahGtd5la2HHNw5coHRRqUWsXJFgXcRnGhzXYSWvBsScxHgVzIa12KRiVUwXmJyjfEmqVSYapGjl8TYFFJdioY00hBxicMHJlzwaF3PJz5cpXgd0UcuXEB4Uc4njFqocYWMdiRUxoRdyVjJYgR6meMIRdoiagGBVqiYxFoZbZjEWimETcgWqV5hWp3tl8TceIReC1gJHpKLHlIonmIziVIQCIRelHEaLQfGIhNxkWqXxV7DS14GZ6GaqHmGAZcoYHF8FaNFpFpJYo1Bd70WNoMCEXelnBKDxeiYPGBzcsXKWCYe1XBFrHlF5POCAhGIDBkUegXNNqiYVnimUVlCIxJw1goWJRyhUlGEeA2cpmnZgJaoGxdrFYlVJNpplGYxKDBgqIiF6lemYKSMTgN5RGQDg15MF6liF4HKEUemZRR6zcsXqFwHiWYRiCnhKXqaAighICCMXiRJJKSjklpRCISghYDJ5zapHJNjJkqJECAXiYXCJiWhEGNVooeeZRiSlkWIqaBIeoHxR7FahmsVamWwYpmUSkwZRViRcRVJOAycmYvmCkWwXGFbSU2Xxh5JWplGRDWPEjpUglEgAAAAA=
+
+In reality it's 239160
+This is due to wrong level change (should go to 19 instead of 18)
+
+Some speed inaccuracies are demonstrated in this:
+https://trochr.github.io/Nes-Tetris-Replay/?sl=18&r=GYEmV5wCKSilpSB4ViUGsaB2cqIPBbCelHGhqnY4mhmUYcpXrZqmYcnsZSplGIPCEXa05MZihiEnoN7BahGjlzxaoVkJ0XcdHOViiYyZRJrHgBnJmDwhEXmmMUkFYoWB3iw4mCISgkXiSDHgqYxVyGcw2rFqQaaJRaDDeiYjWEQe13oN7CcqHsR6JfEXld6kecXIN0BbB3KFalalVrRSTWNEJiURcUGMJSphF4RJCjYZmpZYUVBEKhxoa91KlsYWZVJNKnSkGRRYWUUVjBQTUqWRBbHaBWOhiCdGGsZqjc8WpR0YawGpZxzcZnKBqYaw2uRjHc8nIl0Wc1GshqjaNVoFgXWg1BlSnSqUKVLwUkkvNCVPFhrQqmDFRKA
+Compared to the Video shot on the device: IMG_8974.MOV
 
 Any spin
 ...
@@ -216,6 +226,11 @@ function getSequenceFromUrl() {
             "Zh","Zv","On","Sh","Sv",
             "Lr","Ld","Ll","Lu",
             "Iv","Ih"]
+    shapeWidth=[3,2,3,2,
+            2, 3,2,3,
+            3,2,2,3,2,
+            2,3,2,3,
+            1,3]
 
     for (var i=0; i<cut14.length;i++) {
         s=cut14[i]
@@ -225,6 +240,7 @@ function getSequenceFromUrl() {
         if (!isNaN(column)&& shape != undefined) {
             ns={event: "pieceMove"
             ,shape:shape
+            ,shapeWidth:shapeWidth[shapes.indexOf(shape)]
             ,column:column
             ,row:row}
             sequence.push(ns)
@@ -570,7 +586,6 @@ function draw(game){
         var canvas = document.querySelector('#field')
         var ctx = canvas.getContext("2d")
     
-        console.log("Game is playing clear line animation")       
         if (game.linesToClear.length > 0) {
             // clear animation from the middle, on each line
             ctx.fillStyle = 'black';
@@ -583,7 +598,6 @@ function draw(game){
                 game.linesClearStep+=1
                 game.animation.cleaAnimStep=0
             }
-            console.log("lcs is at: "+game.linesClearStep)
             if (game.linesClearStep == 5) {
                 // What is suspended shall drop to the ground 
                 var canvasTemp = document.querySelector('#fieldTemp')
@@ -646,15 +660,46 @@ function draw(game){
         frameStep=game.animation.frame%gals
 
         if (step != undefined && step.event == "pieceMove" && frameStep == 0) {
+            // if (game.animation.frameY == -3) {
+            //     console.log("A new piece appears")
+            //     // Evaluating if a spin or tuck is need
+            //     // we need any of this if the colums above the 
+            //     // final piece position are not clear above the piece
+                
+            // // // highlighting the colum above the target piece
+            // //     var tx = (game.lastPiece.column-2)
+            // //     var ty = (game.lastPiece.row-3)
+            // //     var gls = game.lastPiece.shape 
+            // //     var glsw = game.lastPiece.shapeWidth
+            // //     var canvas = document.querySelector('#field')
+            // //     var ctx = canvas.getContext("2d");
+            // //     ctx.fillStyle = 'yellow';
+            // //     var deltaPieceX = [1,0,1,1,
+            // //                         1,0,0,1,
+            // //                         1,2,1,1,2,
+            // //                         2,1,1,1,
+            // //                         2,-1]
+            // //     var deltaPieceY = [1,2,1,1,
+            // //                         2,1,2,1,
+            // //                         1,1,1,2,0,
+            // //                         0,1,0,1,
+            // //                         -1,1]
+            // //     var dX = deltaPieceX[shapes.indexOf(gls)]
+            // //     var dY = deltaPieceY[shapes.indexOf(gls)]
+            // //     for (var j=0; j < glsw ; j++) {
+            // //         ctx.fillRect((tx+dX+j)*8+2, (ty+dY)*8+2, 3,3);
+            // //     }            
+            // }
 
-    /*
-    Many levels to reach optimal lateral movement:
-    1. move the correct column and drop, but it will erase the piece
-    2. wait for the path to clear before moving: a tuck
-    3. 
-    4. pathfinding, let's try A*
-    5. spin
-    */ 
+
+            /*
+            Many levels to reach optimal lateral movement:
+            1. move the correct column and drop, but it will erase the piece
+            2. wait for the path to clear before moving: a tuck
+            3. 
+            4. pathfinding, let's try A*
+            5. spin
+            */ 
             // piece animation
             currentX=game.animation.frameX
             currentY=game.animation.frameY
@@ -739,7 +784,7 @@ function draw(game){
                     game.linesClearStep = 0
                 }
                 updateLevelLinesAndScore(c);
-                game.lastPiece={shape:step.shape,column:step.column
+                game.lastPiece={shape:step.shape,shapeWidth:step.shapeWidth,column:step.column
                                 ,row:step.row+1};
                 showNextPiece()
                 copyTemp()
@@ -809,8 +854,115 @@ function initSounds(game) {
     return sounds
 }
 
+function addData(db,date,url,owner){
+    console.log("Will add data")
+    const newItem = {date:date,url:url,owner:owner}
+    const transaction = db.transaction(['NTRgames'], 'readwrite')
+    const objectStore = transaction.objectStore('NTRgames')
+    const addRequest = objectStore.add(newItem)
+
+    addRequest.addEventListener("success", () => { console.log("Add request completed") })
+
+    transaction.addEventListener('error', (e) => { 
+        console.log("There was a transaction error") 
+    })
+
+    transaction.addEventListener('complete',() => {
+        console.log("Transaction completed")
+    })
+
+}
+
+function menuClicked(e) {
+    m = e.parentElement
+    if (m.classList.contains("deployed")) {
+        m.classList.remove("deployed")
+        m.querySelector("div").classList.add("hidden")
+        m.querySelector("span").innerText = "="
+    } else {
+        m.classList.add("deployed")
+        m.querySelector("div").classList.remove("hidden")
+        m.querySelector("span").innerText = "×"
+    }
+}
+
+
+function saveGame() {
+    let db
+
+    const openRequest =  window.indexedDB.open("NTRdb",1)
+    openRequest.addEventListener('error', () => log("DbOpen failed"))
+    openRequest.addEventListener('success', () => {
+        db= openRequest.result;
+        addData(db,Date.now(),document.URL,"trochr") 
+        // addData(db,Date.now(),"http:/g8.co","me")
+        // deleteItem(db,541)
+        // for (let i = 1; i< 1000; i++) {
+        //     deleteItem(db,i)
+        // }
+        // document.querySelector("#export").onclick = function(){
+        //     console.log("Export btn clicked")
+        //     exportData(db)
+        // }
+
+        // document.querySelector("#importfile").onchange = function(e){
+        //     var reader = new FileReader()
+        //     console.log("File reader ready")
+        //     reader.onload = function() {
+        //         importData(db, JSON.parse(reader.result))
+        //     }
+        //     reader.readAsText(e.target.files[0])
+        // }
+    })
+
+    openRequest.addEventListener('upgradeneeded', (e) => {
+        console.log("Db needs upgradation")
+        // get a reference of the db
+        db = e.target.result 
+
+        const objectStore = db.createObjectStore('NTRgames', {keyPath: 'id', autoIncrement:true})
+        objectStore.createIndex('date', 'date', {unique:false})
+        objectStore.createIndex('url', 'url', {unique:true})
+        objectStore.createIndex('owner', 'owner', {unique:false})
+        console.log("Db setup complete")
+    })
+
+    return db
+}
+
+
+function loadGames() {
+    let db
+    const openRequest =  window.indexedDB.open("NTRdb",1)
+    openRequest.addEventListener('error', () => log("DbOpen failed"))
+
+    openRequest.addEventListener('success', () => {
+        db = openRequest.result;
+        const objectStore = db.transaction('NTRgames').objectStore('NTRgames')
+        let oc = objectStore.openCursor()
+        oc.addEventListener('success',(e) => {
+            const cursor = e.target.result
+            let table = document.querySelector("#gamesTable")
+            if (cursor) {
+                tr=table.insertRow()
+                td=tr.insertCell()
+                let d = new Date(cursor.value.date).toISOString()
+                d=d.split(".")[0].replace("T"," ")
+                td.innerHTML=`<a href="${cursor.value.url}">${d}</a> ${cursor.value.owner}`
+                cursor.continue()
+            }
+        }) 
+    })
+}
+
+
 function tetrisGame(gameDecoded){
-//   reduceFrames(json,game)
+
+    // Save game to local DB
+    saveGame()
+    loadGames()
+
+    //   reduceFrames(json,game)
     game = {paused:false,piecesCount :0,score:0
     ,lines:0,level:0};
 

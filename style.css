@@ -5,6 +5,44 @@ body {
     font-size: small;
 }
   
+.hidden {
+    visibility: hidden;
+}
+
+
+#menuBurger {
+    user-select: none;
+}
+
+table {
+    font-size: small;
+}
+#menu {
+    font-size: small;
+    width: 20px;
+    height: 20px;
+    background-color:  rgba(0,0,0,0);
+    color: white;
+    /* border: 1px solid white; */
+    position: absolute;
+    right:20px;
+    top:20px;
+    text-align: right;
+}
+
+
+#menu.deployed {
+    width: 220px;
+    height: 100%;
+    background-color:  rgba(0,0,0,0);
+    color: white;
+    /* border: 1px solid white; */
+    position: absolute;
+    right:20px;
+    top:20px;
+}
+
+
 #status {
     visibility: hidden;
 }
