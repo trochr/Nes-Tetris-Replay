@@ -24,6 +24,7 @@ Features:
 + host that on github
 + Size correctly on iPhone
 + save games (in localStorage), record date/time
++ As this is a client only app, have an import/export function
 Compute the final game stat on start
 have all this settings an a NES style interface
 add stats : Tetris Rate
@@ -955,6 +956,62 @@ function loadGames() {
     })
 }
 
+function download(filename, text) {
+    var element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    element.setAttribute('download', filename);
+  
+    element.style.display = 'none';
+    document.body.appendChild(element);
+  
+    element.click();
+  
+    document.body.removeChild(element);
+  }
+
+
+function exportGames() {
+    const openRequest =  window.indexedDB.open("NTRdb",1)
+    openRequest.addEventListener('error', () => log("DbOpen failed"))
+
+    openRequest.addEventListener('success', () => {
+        db = openRequest.result;
+
+        const objectStore = db.transaction('NTRgames').objectStore('NTRgames')
+        let output = []
+        let oc = objectStore.openCursor()
+        oc.addEventListener('success',(e) => {
+            const cursor = e.target.result
+            if (cursor) {
+                output.push(cursor.value)
+                cursor.continue()
+            } else {
+                download(`NTRgames-Export-${new Date().toISOString().slice(0,10)}.txt` , JSON.stringify(output)); 
+            }
+        })
+    })
+}
+
+function importData(db,importedData){
+    importedData.forEach(element => {
+        addData(db,element.date, element.url, element.owner)
+    });
+}
+
+function readFileAndImport(e) {
+    const openRequest =  window.indexedDB.open("NTRdb",1)
+    openRequest.addEventListener('error', () => console.log("DbOpen failed"))
+    console.log(e)
+    openRequest.addEventListener('success', () => {
+        db = openRequest.result;
+
+        var reader = new FileReader()
+        reader.onload = function() {
+            importData(db, JSON.parse(reader.result))
+        }
+        reader.readAsText(e.files[0])
+    })
+}
 
 function tetrisGame(gameDecoded){
 
