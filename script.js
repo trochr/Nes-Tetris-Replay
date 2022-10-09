@@ -25,7 +25,9 @@ Features:
 + Size correctly on iPhone
 + save games (in localStorage), record date/time
 + As this is a client only app, have an import/export function
-Compute the final game stat on start
++ Save game stats at the end of the run
+Sort games by lines/score/date/tag
+Manage name so that it can be shared and imported
 have all this settings an a NES style interface
 add stats : Tetris Rate
 compute and show game time
@@ -73,7 +75,7 @@ Speed seems funky on levels below 13
 
 /* Test games
 With 2 tetris:
-sl=14&r=eckksZlCEXlAYxKLUiB4KN4me4Gsh7zapXAFaHbAUqmUUgJ3qmUUkNHvRgzSxDvMkQAAAA=
+?sl=14&r=eckksZlCEXlAYxKLUiB4KN4me4Gsh7zapXAFaHbAUqmUUgJ3qmUUkNHvRgzSxDvMkQAAAA=
 
 Single tuck
 ?sl=18&r=OQVks3qJrSUkkBMxkglWmQjFEEA
@@ -159,20 +161,6 @@ window.onload = function() {
     saveGame()
 }
 
-async function saveGame() {
-    params=window.location.search.split("?")[1]
-    console.log("Will save: "+params)
-    sha = await sha256(params);
-    replayUUID = sha.slice(0,8)+"-"+sha.slice(8,12)+"-"+sha.slice(12,16)
-        +"-"+sha.slice(16,20)+"-"+sha.slice(20,32)
-    console.log(replayUUID);
-    // check if is present in localStorage
-
-    // add to localStorage
-
-    // init LocalStorage if empty
-
-}
 
 function initLocalStorage () {
     localStorage.setItem("ntr",12)
@@ -751,6 +739,7 @@ function draw(game){
             if (targetY == currentY) {
                 game.frame+=1
                 if (game.frame >= game.frames.length) {
+                    saveStats()
                     clearInterval(this.gameInt)
                     endScreen()
                     return;
@@ -856,22 +845,15 @@ function initSounds(game) {
 }
 
 function addData(db,date,url,owner){
-    console.log("Will add data")
     const newItem = {date:date,url:url,owner:owner}
     const transaction = db.transaction(['NTRgames'], 'readwrite')
     const objectStore = transaction.objectStore('NTRgames')
     const addRequest = objectStore.add(newItem)
 
-    addRequest.addEventListener("success", () => { console.log("Add request completed") })
 
     transaction.addEventListener('error', (e) => { 
         console.log("There was a transaction error") 
     })
-
-    transaction.addEventListener('complete',() => {
-        console.log("Transaction completed")
-    })
-
 }
 
 function menuClicked(e) {
@@ -888,6 +870,36 @@ function menuClicked(e) {
 }
 
 
+function saveStats() {
+    let db
+
+    const openRequest =  window.indexedDB.open("NTRdb",1)
+    openRequest.addEventListener('error', () => log("DbOpen failed"))
+    openRequest.addEventListener('success', () => {
+        db=openRequest.result;
+
+        // recover current game Save id        
+        const objectStore = db.transaction('NTRgames', 'readwrite')
+                            .objectStore('NTRgames');
+
+
+        objectStore.openCursor().onsuccess = (event) => {
+            const cursor = event.target.result;
+            if (cursor) {
+                if (cursor.value.url === document.URL) {
+                const currentGame  = cursor.value;
+                currentGame.owner = "trochr";
+                currentGame.score = game.score;
+                currentGame.lines = game.lines;
+                const request = cursor.update(currentGame);
+              }
+              cursor.continue();
+            }
+        }
+    })
+}
+
+
 function saveGame() {
     let db
 
@@ -895,25 +907,7 @@ function saveGame() {
     openRequest.addEventListener('error', () => log("DbOpen failed"))
     openRequest.addEventListener('success', () => {
         db= openRequest.result;
-        addData(db,Date.now(),document.URL,"trochr") 
-        // addData(db,Date.now(),"http:/g8.co","me")
-        // deleteItem(db,541)
-        // for (let i = 1; i< 1000; i++) {
-        //     deleteItem(db,i)
-        // }
-        // document.querySelector("#export").onclick = function(){
-        //     console.log("Export btn clicked")
-        //     exportData(db)
-        // }
-
-        // document.querySelector("#importfile").onchange = function(e){
-        //     var reader = new FileReader()
-        //     console.log("File reader ready")
-        //     reader.onload = function() {
-        //         importData(db, JSON.parse(reader.result))
-        //     }
-        //     reader.readAsText(e.target.files[0])
-        // }
+        addData(db,Date.now(),document.URL,"trochr")
     })
 
     openRequest.addEventListener('upgradeneeded', (e) => {
@@ -932,6 +926,10 @@ function saveGame() {
 }
 
 
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
 function loadGames() {
     let db
     const openRequest =  window.indexedDB.open("NTRdb",1)
@@ -948,10 +946,38 @@ function loadGames() {
                 tr=table.insertRow()
                 td=tr.insertCell()
                 let d = new Date(cursor.value.date).toISOString()
-                d=d.split(".")[0].replace("T"," ")
-                td.innerHTML=`<a href="${cursor.value.url}">${d}</a> ${cursor.value.owner}`
+                d=d.split(".")[0].replace("T"," ").split(":")
+                d=d[0]+":"+d[1]
+                score=cursor.value.score
+                lines=cursor.value.lines
+                // score=(score == undefined)? -1 : numberWithCommas(score)
+                score=(score == undefined)? -1 : score
+                lines=(lines == undefined)? -1 : lines
+                td.innerHTML=`<a href="${cursor.value.url}">${d}</a>`
+                td=tr.insertCell()
+                td.innerHTML=cursor.value.owner
+                td=tr.insertCell()
+                td.innerHTML=lines
+                td=tr.insertCell()
+                td.innerHTML=score
+
                 cursor.continue()
+            } else {
+                const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
+
+                const comparer = (idx, asc) => (a, b) => ((v1, v2) => 
+                v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2)
+                )(getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
+
+                // do the work...
+                document.querySelectorAll('th').forEach(th => th.addEventListener('click', (() => {
+                const table = th.closest('table');
+                Array.from(table.querySelectorAll('tr:nth-child(n+2)'))
+                .sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
+                .forEach(tr => table.appendChild(tr) );
+                })));
             }
+            
         }) 
     })
 }
@@ -971,6 +997,7 @@ function download(filename, text) {
 
 
 function exportGames() {
+    console.log("Export requested")
     const openRequest =  window.indexedDB.open("NTRdb",1)
     openRequest.addEventListener('error', () => log("DbOpen failed"))
 
@@ -999,9 +1026,9 @@ function importData(db,importedData){
 }
 
 function readFileAndImport(e) {
+    console.log("Import requested")
     const openRequest =  window.indexedDB.open("NTRdb",1)
     openRequest.addEventListener('error', () => console.log("DbOpen failed"))
-    console.log(e)
     openRequest.addEventListener('success', () => {
         db = openRequest.result;
 

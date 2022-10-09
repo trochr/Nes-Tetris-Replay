@@ -102,7 +102,7 @@
             <div class="hidden" id="menuDetail">
                 <div id="gameList">
                     List of games
-                    <table id="gamesTable"></table>
+                    <table id="gamesTable"><tr><th>Date</th><th>Author</th><th>Lines</th><th>Score</th></tr></table>
                     <span id="exportBtn" onclick="exportGames()">export</span> 
                     <span id="importBtn" onclick="document.querySelector('#importfile').click();">import</span>
                     <input type="file" id="importfile" style="visibility:hidden" onchange="readFileAndImport(this);"></input>

@@ -17,6 +17,11 @@ body {
 table {
     font-size: small;
 }
+
+td {
+    text-align: center;
+}
+
 #menu {
     font-size: small;
     width: 20px;
@@ -32,7 +37,7 @@ table {
 
 
 #menu.deployed {
-    width: 220px;
+    width: 300px;
     height: 100%;
     background-color:  rgba(0,0,0,0);
     color: white;
