@@ -27,6 +27,7 @@ Features:
 + As this is a client only app, have an import/export function
 + Save game stats at the end of the run
 + Display a overview of all the games recorded in the localStorage
++Deal with local timezones
 Sort games by lines/score/date/tag
 Expedite playback
 Manage name so that it can be shared and imported
@@ -939,6 +940,23 @@ function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
+
+function formatDate(date) {
+    let p = new Intl.DateTimeFormat('en',{
+      year:'numeric',
+      month:'2-digit',
+      day:'2-digit',
+      hour:'2-digit',
+      minute:'2-digit',
+      hour12: false
+    }).formatToParts(date).reduce((acc, part) => {
+        acc[part.type] = part.value;
+        return acc;
+    }, {});
+    
+    return `${p.year}/${p.month}/${p.day} ${p.hour}:${p.minute}`; 
+}
+
 function loadGames() {
     let db
     const openRequest =  window.indexedDB.open("NTRdb",1)
@@ -954,9 +972,7 @@ function loadGames() {
             if (cursor) {
                 tr=table.insertRow()
                 td=tr.insertCell()
-                let d = new Date(cursor.value.date).toISOString()
-                d=d.split(".")[0].replace("T"," ").split(":")
-                d=d[0]+":"+d[1]
+                let d=formatDate(cursor.value.date)
                 score=cursor.value.score
                 lines=cursor.value.lines
                 // score=(score == undefined)? -1 : numberWithCommas(score)
