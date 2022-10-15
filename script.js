@@ -844,8 +844,8 @@ function initSounds(game) {
     return sounds
 }
 
-function addData(db,date,url,owner){
-    const newItem = {date:date,url:url,owner:owner}
+function addData(db,date,url,owner,score,lines){
+    const newItem = {date:date,url:url,owner:owner,score:score,lines:lines}
     const transaction = db.transaction(['NTRgames'], 'readwrite')
     const objectStore = transaction.objectStore('NTRgames')
     const addRequest = objectStore.add(newItem)
@@ -1021,7 +1021,7 @@ function exportGames() {
 
 function importData(db,importedData){
     importedData.forEach(element => {
-        addData(db,element.date, element.url, element.owner)
+        addData(db,element.date, element.url, element.owner,element.score,element.lines)
     });
 }
 
