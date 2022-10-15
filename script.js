@@ -26,14 +26,15 @@ Features:
 + save games (in localStorage), record date/time
 + As this is a client only app, have an import/export function
 + Save game stats at the end of the run
++ Display a overview of all the games recorded in the localStorage
 Sort games by lines/score/date/tag
+Expedite playback
 Manage name so that it can be shared and imported
 have all this settings an a NES style interface
 add stats : Tetris Rate
 compute and show game time
 menu selection beep
 show the game at a certain : frame/percentage/time, thanks to a URL parameter
-Display a overview of all the games recorded in the localStorage
 Tag games of special interst
 allow comments on the games (use something like disqus or alternatives : yt/K0WJRApcKCA)
 can publish a game 
@@ -64,6 +65,7 @@ Issues to fix:
 + very long breaks are happening, unclear when and why
 + fix the speed issue
 + slow down the clear line animation
++ Sometimes some junk is placed on the right of the screen at the end of the replay
 Stop these transparent pieces, and deal with pathfinding (hard!).
 > Turns out, there is a smarter way (where is the piece on the row above ? position / slide +/- 1) also consider low lever multi tuck
 interrupt sound playing to avoid piling in fast replays, delays
@@ -86,6 +88,9 @@ Multilpe tuck
 T-spin
 ?sl=18&r=mShkppwiCghGHJOZVkhIKRyRiEWqJ4lWtkmYzGG1UqUIgAA
 
+Stuck piece at the end
+?sl=0&r=CQTjJYIaDDkpHMVgVSpDsUplEEA
+
 This very long game has a false score (239020):
 https://trochr.github.io/Nes-Tetris-Replay/?sl=18&r=OYBksYuWSGkxYKiUWgwXqKDEeV3IFxUa0mgZoJlEXqiMRaoVvJ7CY1HDd5lelFqVqVW+ZRNq1ayIKJiZg8WqRhnel2jlz2cEnJVgVUwIRRoxfE1pl6gdEWshyiWmXRJSQWaGqdxUY2GnhkmW4WmlpBa42od0ga1nSdpxcxXjh5zeIXKN4GhEXKWBjeyIEFijax3JJ8WaEVnFLJlFHsNoZg93pWBpg8HxV8CahGtd5la2HHNw5coHRRqUWsXJFgXcRnGhzXYSWvBsScxHgVzIa12KRiVUwXmJyjfEmqVSYapGjl8TYFFJdioY00hBxicMHJlzwaF3PJz5cpXgd0UcuXEB4Uc4njFqocYWMdiRUxoRdyVjJYgR6meMIRdoiagGBVqiYxFoZbZjEWimETcgWqV5hWp3tl8TceIReC1gJHpKLHlIonmIziVIQCIRelHEaLQfGIhNxkWqXxV7DS14GZ6GaqHmGAZcoYHF8FaNFpFpJYo1Bd70WNoMCEXelnBKDxeiYPGBzcsXKWCYe1XBFrHlF5POCAhGIDBkUegXNNqiYVnimUVlCIxJw1goWJRyhUlGEeA2cpmnZgJaoGxdrFYlVJNpplGYxKDBgqIiF6lemYKSMTgN5RGQDg15MF6liF4HKEUemZRR6zcsXqFwHiWYRiCnhKXqaAighICCMXiRJJKSjklpRCISghYDJ5zapHJNjJkqJECAXiYXCJiWhEGNVooeeZRiSlkWIqaBIeoHxR7FahmsVamWwYpmUSkwZRViRcRVJOAycmYvmCkWwXGFbSU2Xxh5JWplGRDWPEjpUglEgAAAAA=
 
@@ -97,6 +102,10 @@ https://trochr.github.io/Nes-Tetris-Replay/?sl=18&r=GYEmV5wCKSilpSB4ViUGsaB2cqIP
 Compared to the Video shot on the device: IMG_8974.MOV
 
 Any spin
+
+Massive replay (31 games):
+http://127.0.0.1:3000/tests/fillScreen.html
+
 ...
 
 
@@ -1051,6 +1060,7 @@ function tetrisGame(gameDecoded){
     ,lines:0,level:0};
 
     game.frames=gameDecoded[0]
+    game.frames.pop() // removing last piece because it glitches
     game.gameDecoded=gameDecoded
     window.game=game
     game.level=parseInt(gameDecoded[1])
