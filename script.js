@@ -52,7 +52,7 @@ function slashSplitURL() {
     // Adding slashes to allow iOS sharing
 
     let params = new URLSearchParams(window.location.search);
-    let r=params.get("r"); // "foo"
+    let r=params.get("r");
     if (r[0] != "/") { // only do the processing once
         r=r.replaceAll("/","//")
         r=r.replaceAll("=","")
