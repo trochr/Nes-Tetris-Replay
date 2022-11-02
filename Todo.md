@@ -27,7 +27,7 @@ Features:
 + Save game stats at the end of the run
 + Display a overview of all the games recorded in the localStorage
 + Deal with local timezones
-Sort games by lines/score/date/tag
++ Sort games by lines/score/date/tag
 Expedite playback
 Manage name so that it can be shared and imported
 have all this settings an a NES style interface
@@ -45,7 +45,7 @@ stats and other stuff to analyze:
 - rate of good games (aGameScout)
 - highest tetris
 - latest tetris (by line, by score)
-- best I shortage survival
+- longest drought (I shortage), longest survived
 - Biggest scattered stack drillage 
 - RNG kindness 
 - T spins
@@ -55,7 +55,9 @@ make it pixel perfect
 Have a zooming option
 add comments to the game, that can be displayed in real time
 have a owner status in the comments
-
+List caveats :
+- can't reproduce exact piece movements done by the player, they're synthetized by the replay engine
+- limit on replay size : max pieces
 
 
 Issues to fix:
@@ -74,6 +76,7 @@ Issues to fix:
 + fix the speed issue
 + slow down the clear line animation
 + Sometimes some junk is placed on the right of the screen at the end of the replay
++ Sharing by iMessage doesn't work on long urls, it truncates the URL at some point
 Make the next piece match the original
 Stop these transparent pieces, and deal with pathfinding (hard!).
 > Turns out, there is a smarter way (where is the piece on the row above ? position / slide +/- 1) also consider low lever multi tuck
@@ -111,6 +114,11 @@ https://trochr.github.io/Nes-Tetris-Replay/?sl=18&r=GYEmV5wCKSilpSB4ViUGsaB2cqIP
 Compared to the Video shot on the device: IMG_8974.MOV
 
 Any spin
+To get : game showing every single spin
+
+Any tuck
+To get : game showing every tuck
+
 
 Massive replay (31 games):
 http://127.0.0.1:3000/tests/fillScreen.html
