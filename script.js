@@ -55,6 +55,7 @@ function slashSplitURL() {
     let r=params.get("r"); // "foo"
     if (r[0] != "/") { // only do the processing once
         r=r.replaceAll("/","//")
+        r=r.replaceAll("=","")
         r="/"+r
         r=r.match(/.{1,300}/g)
         r=r.join("/")
@@ -93,7 +94,6 @@ function getSequenceFromUrl() {
     r=r.replaceAll("/","")
     r=r.replaceAll("_","/")
     startLevel=params.get("sl")
-    console.log(`will decode ${r}`)
     decoded=atob(r)
     decodedBytes=[]
     for (var i=0; i<decoded.length; i++) {
