@@ -93,6 +93,7 @@ function getSequenceFromUrl() {
     r=r.replaceAll("/","")
     r=r.replaceAll("_","/")
     startLevel=params.get("sl")
+    console.log(`will decode ${r}`)
     decoded=atob(r)
     decodedBytes=[]
     for (var i=0; i<decoded.length; i++) {

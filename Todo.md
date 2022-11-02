@@ -76,7 +76,7 @@ Issues to fix:
 + fix the speed issue
 + slow down the clear line animation
 + Sometimes some junk is placed on the right of the screen at the end of the replay
-+ Sharing by iMessage doesn't work on long urls, it truncates the URL at some point
+Sharing by iMessage doesn't work on long urls, it truncates the URL at some point
 Make the next piece match the original
 Stop these transparent pieces, and deal with pathfinding (hard!).
 > Turns out, there is a smarter way (where is the piece on the row above ? position / slide +/- 1) also consider low lever multi tuck
