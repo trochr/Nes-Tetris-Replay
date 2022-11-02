@@ -25,7 +25,6 @@ window.onload = function() {
     buildShapes()
     document.querySelector("#main").onclick = togglePauseGameReplay;
     document.querySelector("#speedSlider").oninput = changeSpeed;
-    slashSplitURL() // fixes issue in iOS URL detection by inserting slashes
     tetrisGame(getSequenceFromUrl())
     if (localStorage.getItem("ntr")  == undefined ) {
         initLocalStorage()
@@ -34,35 +33,6 @@ window.onload = function() {
     saveGame()
 }
 
-function unSlashSplitURL() {
-    let url = new URL(window.location)
-    let params = new URLSearchParams(url.search);
-    let r=params.get("r").replaceAll(" ","+"); 
-    // clean the slashes added for iOS sharing purpose
-    r=r.replaceAll("//","_")
-    r=r.replaceAll("/","")
-    r=r.replaceAll("_","/")
-    params.set("r",r)
-    url.search = decodeURIComponent(params)
-    return url.toString()
-}
-
-
-function slashSplitURL() {
-    // Adding slashes to allow iOS sharing
-
-    let params = new URLSearchParams(window.location.search);
-    let r=params.get("r"); // "foo"
-    if (r[0] != "/") { // only do the processing once
-        r=r.replaceAll("/","//")
-        r="/"+r
-        r=r.match(/.{1,300}/g)
-        r=r.join("/")
-        params.set("r",r)
-        window.location.search = decodeURIComponent(params)    
-    }
-    return
-}
 
 function initLocalStorage () {
     localStorage.setItem("ntr",12)
@@ -86,14 +56,10 @@ function dec2bin(dec) {
     return (dec >>> 0).toString(2);
   }
 function getSequenceFromUrl() {
-    let params = new URLSearchParams(window.location.search);
-    let r=params.get("r").replaceAll(" ","+"); 
-    // clean the slashes added for iOS sharing purpose
-    r=r.replaceAll("//","_")
-    r=r.replaceAll("/","")
-    r=r.replaceAll("_","/")
-    startLevel=params.get("sl")
-    decoded=atob(r)
+    params=window.location.search.split("?")[1]
+    e64=params.split("&")[1].split("=")[1]
+    startLevel=params.split("&")[0].split("=")[1]
+    decoded=atob(e64)
     decodedBytes=[]
     for (var i=0; i<decoded.length; i++) {
         decodedBytes.push(decoded[i].charCodeAt(0))
@@ -819,7 +785,7 @@ function saveStats() {
         objectStore.openCursor().onsuccess = (event) => {
             const cursor = event.target.result;
             if (cursor) {
-                if (cursor.value.url === unSlashSplitURL()) {
+                if (cursor.value.url === document.URL) {
                 const currentGame  = cursor.value;
                 currentGame.owner = "trochr";
                 currentGame.score = game.score;
@@ -840,7 +806,7 @@ function saveGame() {
     openRequest.addEventListener('error', () => log("DbOpen failed"))
     openRequest.addEventListener('success', () => {
         db= openRequest.result;
-        addData(db,Date.now(),unSlashSplitURL(),"trochr")
+        addData(db,Date.now(),document.URL,"trochr")
     })
 
     openRequest.addEventListener('upgradeneeded', (e) => {
