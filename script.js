@@ -25,6 +25,7 @@ window.onload = function() {
     buildShapes()
     document.querySelector("#main").onclick = togglePauseGameReplay;
     document.querySelector("#speedSlider").oninput = changeSpeed;
+    slashSplitURL() // fixes issue in iOS URL detection by inserting slashes
     tetrisGame(getSequenceFromUrl())
     if (localStorage.getItem("ntr")  == undefined ) {
         initLocalStorage()
@@ -815,14 +816,14 @@ function saveStats() {
         objectStore.openCursor().onsuccess = (event) => {
             const cursor = event.target.result;
             if (cursor) {
-                if (cursor.value.url === document.URL) {
-                const currentGame  = cursor.value;
-                currentGame.owner = "trochr";
-                currentGame.score = game.score;
-                currentGame.lines = game.lines;
-                const request = cursor.update(currentGame);
-              }
-              cursor.continue();
+                if (cursor.value.url === unSlashSplitURL()) {
+                    const currentGame  = cursor.value;
+                    currentGame.owner = "trochr";
+                    currentGame.score = game.score;
+                    currentGame.lines = game.lines;                    
+                    const request = cursor.update(currentGame);
+                }
+                cursor.continue();
             }
         }
     })
@@ -836,7 +837,7 @@ function saveGame() {
     openRequest.addEventListener('error', () => log("DbOpen failed"))
     openRequest.addEventListener('success', () => {
         db= openRequest.result;
-        addData(db,Date.now(),document.URL,"trochr")
+        addData(db,Date.now(),unSlashSplitURL(),"trochr")
     })
 
     openRequest.addEventListener('upgradeneeded', (e) => {
