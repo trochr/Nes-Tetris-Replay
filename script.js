@@ -51,6 +51,36 @@ async function sha256(text) {
     const digestHex = await digestMessage(text);
     return digestHex;
 }
+function unSlashSplitURL() {
+    let url = new URL(window.location)
+    let params = new URLSearchParams(url.search);
+    let r=params.get("r").replaceAll(" ","+"); 
+    // clean the slashes added for iOS sharing purpose
+    r=r.replaceAll("//","_")
+    r=r.replaceAll("/","")
+    r=r.replaceAll("_","/")
+    params.set("r",r)
+    url.search = decodeURIComponent(params)
+    return url.toString()
+}
+
+
+function slashSplitURL() {
+    // Adding slashes to allow iOS sharing
+
+    let params = new URLSearchParams(window.location.search);
+    let r=params.get("r");
+    if (r[0] != "/") { // only do the processing once
+        r=r.replaceAll("/","//")
+        r=r.replaceAll("=","")
+        r="/"+r
+        r=r.match(/.{1,300}/g)
+        r=r.join("/")
+        params.set("r",r)
+        window.location.search = decodeURIComponent(params)    
+    }
+    return
+}
 
 function dec2bin(dec) {
     return (dec >>> 0).toString(2);
