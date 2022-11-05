@@ -76,13 +76,13 @@ Issues to fix:
 + fix the speed issue
 + slow down the clear line animation
 + Sometimes some junk is placed on the right of the screen at the end of the replay
-Sharing by iMessage doesn't work on long urls, it truncates the URL at some point
-Make the next piece match the original
++ Sharing by iMessage doesn't work on long urls, it truncates the URL at some point
++ Correct the level formula, it is wrong about 100 or so...
+Make the next piece match the original (what does it mean?)
 Stop these transparent pieces, and deal with pathfinding (hard!).
-> Turns out, there is a smarter way (where is the piece on the row above ? position / slide +/- 1) also consider low lever multi tuck
+> Turns out, there is a smarter way (where was the piece on the row above ? position / slide +/- 1) also consider low lever multi tuck
 interrupt sound playing to avoid piling in fast replays, delays
 On same topic there is a discrepancy between Chrome & Safari
-correct the level formula, it is wrong about 100 or so...
 Fix this weird unreachable round 60 FPS (who cares ?)
 Speed seems funky on levels below 13
 */
@@ -94,7 +94,7 @@ With 2 tetris:
 Single tuck
 ?sl=18&r=OQVks3qJrSUkkBMxkglWmQjFEEA
 
-Multilpe tuck
+Multipe tuck
 ?sl=0&r=iTJeppHlqoWGUKgyWg12qWcmWNkRYj1CoAAAAA=
 
 T-spin
@@ -108,6 +108,9 @@ https://trochr.github.io/Nes-Tetris-Replay/?sl=18&r=OYBksYuWSGkxYKiUWgwXqKDEeV3I
 
 In reality it's 239160
 This is due to wrong level change (should go to 19 instead of 18)
+
+Another potentially wrong level change:
+?sl=14&r=/KchkVpyGCGlBIrKDFgcXKiUQY1HKJr3elnBJRFdFljVIUYpFEU7ASEDsNJjMmZRJb4gqZRiSpk+HyiLokUoLaBJgqHuCERelXkOAUi+IqGRhi6IKOCBeRZMBxlgwnRR5neBWsNxgW2ZRN6AZEXJeLDa9XnV0BYZWKd7Ia+ZRV7AawnMmUUi+YqR55epoNJ6keVXMeUQkEopeT0iaJNGIhgV4wN6GhBXlmURkkIhaKnkx4HB7DiEnpV5HcomrhwRYtmNhjEdEGJVr3aZWQBaVUomsdbUS01qmUQcGZRaJojE/HsBrGe5XFVg4aRFBOBHYqYxKCWa0niVaXawnANhgalUqlrwaEmxFgzY8FBhqlWcEMhaphE3FhqjYhmqmEZgNoyKIxgt5SOSWmV5MOQQjFojKChc1IJeDHcxXMBpjek2kFShQqZRFSkg9oDmT4iQpRSCiel4xWKYfFXpFanaYUqJoUcE1tZhJlFHsdwwW1GslyidFXMNxncyZRGDyglXqeDDc4WqBbSYklKRhGhEknVoYchVjdrZc81sZxgYGZRiTwbEExJ44eR2NFqVe1HDVrDY80qVbJa8WRZQ5WQDshSkZ/GWKd0QUwmkVqTbGVqJQZSpGmVimawWCRsHaY2IZ0QY0mAFSZlFXrmMYiRoKeMTixnqZxwgmYvB8UiM4KJ7oiFIviJxgiYKJ6JcoHJFjFi83DeEYYxXERpmlEnsNzBal4NNRGckVxRrGYlVmhzESmVqJJnSiENY41KkzKMiTF
 
 Some speed inaccuracies are demonstrated in this:
 https://trochr.github.io/Nes-Tetris-Replay/?sl=18&r=GYEmV5wCKSilpSB4ViUGsaB2cqIPBbCelHGhqnY4mhmUYcpXrZqmYcnsZSplGIPCEXa05MZihiEnoN7BahGjlzxaoVkJ0XcdHOViiYyZRJrHgBnJmDwhEXmmMUkFYoWB3iw4mCISgkXiSDHgqYxVyGcw2rFqQaaJRaDDeiYjWEQe13oN7CcqHsR6JfEXld6kecXIN0BbB3KFalalVrRSTWNEJiURcUGMJSphF4RJCjYZmpZYUVBEKhxoa91KlsYWZVJNKnSkGRRYWUUVjBQTUqWRBbHaBWOhiCdGGsZqjc8WpR0YawGpZxzcZnKBqYaw2uRjHc8nIl0Wc1GshqjaNVoFgXWg1BlSnSqUKVLwUkkvNCVPFhrQqmDFRKA

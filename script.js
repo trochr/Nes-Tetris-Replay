@@ -414,6 +414,7 @@ function clearLines(game,shape,row)
 
 function updateLevelLinesAndScore(count) {
     window.game.lines+=count;
+    let decadeJump = Math.floor((window.game.lines+count)/10) > Math.floor(window.game.lines/10)
     if (count == 4) {
         if (!game.soundOff) {
             game.sounds["tetris"].play()
@@ -423,12 +424,19 @@ function updateLevelLinesAndScore(count) {
             game.sounds["clear"].play()
         }
     }
-    // this is wrong after level 100:
-    if (Math.floor((window.game.lines)/10)>window.game.level) {
-        window.game.level+=1;
-        buildShapes()
-        repaintShapes()
+
+    if (count > 0 && decadeJump) {
+        let falseStartLevel = parseInt(game.startLevel.toString(16)) // Base confusion in the og ROM
+        if (isNaN(falseStartLevel)) { // fixing the a-e convertion to dec
+            falseStartLevel = 9
+        }
+        if (Math.floor(window.game.lines/10) > falseStartLevel) {
+            window.game.level+=1;
+            buildShapes()
+            repaintShapes()
+        }
     }
+
     scoreTable=[0,40,100,300,1200]
     window.game.score+=scoreTable[count]*(window.game.level+1)
     document.querySelector("#linesCount").innerText=window.game.lines;
@@ -997,13 +1005,14 @@ function tetrisGame(gameDecoded){
 
     //   reduceFrames(json,game)
     game = {paused:false,piecesCount :0,score:0
-    ,lines:0,level:0};
+    ,lines:0,level:0,startLevel:0};
 
     game.frames=gameDecoded[0]
     game.frames.pop() // removing last piece because it glitches
     game.gameDecoded=gameDecoded
     window.game=game
     game.level=parseInt(gameDecoded[1])
+    game.startLevel=game.level
     buildShapes()
     repaintShapes()
     game.frame = 0;
