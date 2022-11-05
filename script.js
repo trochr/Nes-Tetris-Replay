@@ -85,12 +85,17 @@ function slashSplitURL() {
 
 function dec2bin(dec) {
     return (dec >>> 0).toString(2);
-  }
+}
+
 function getSequenceFromUrl() {
-    params=window.location.search.split("?")[1]
-    e64=params.split("&")[1].split("=")[1]
-    startLevel=params.split("&")[0].split("=")[1]
-    decoded=atob(e64)
+    let params = new URLSearchParams(window.location.search);
+    let r=params.get("r").replaceAll(" ","+"); 
+    // clean the slashes added for iOS sharing purpose
+    r=r.replaceAll("//","_")
+    r=r.replaceAll("/","")
+    r=r.replaceAll("_","/")
+    startLevel=params.get("sl")
+    decoded=atob(r)
     decodedBytes=[]
     for (var i=0; i<decoded.length; i++) {
         decodedBytes.push(decoded[i].charCodeAt(0))
@@ -817,13 +822,13 @@ function saveStats() {
             const cursor = event.target.result;
             if (cursor) {
                 if (cursor.value.url === unSlashSplitURL()) {
-                    const currentGame  = cursor.value;
-                    currentGame.owner = "trochr";
-                    currentGame.score = game.score;
-                    currentGame.lines = game.lines;                    
-                    const request = cursor.update(currentGame);
-                }
-                cursor.continue();
+                const currentGame  = cursor.value;
+                currentGame.owner = "trochr";
+                currentGame.score = game.score;
+                currentGame.lines = game.lines;
+                const request = cursor.update(currentGame);
+              }
+              cursor.continue();
             }
         }
     })
