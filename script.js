@@ -413,8 +413,8 @@ function clearLines(game,shape,row)
 }
 
 function updateLevelLinesAndScore(count) {
-    window.game.lines+=count;
     let decadeJump = Math.floor((window.game.lines+count)/10) > Math.floor(window.game.lines/10)
+    window.game.lines+=count;
     if (count == 4) {
         if (!game.soundOff) {
             game.sounds["tetris"].play()
