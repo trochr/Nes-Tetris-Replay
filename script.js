@@ -34,7 +34,6 @@ window.onload = function() {
     saveGame()
 }
 
-
 function initLocalStorage () {
     localStorage.setItem("ntr",12)
 }
