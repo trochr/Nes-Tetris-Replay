@@ -3,7 +3,7 @@ Goal
 
 Replay some sweet NES tetris 
 
-[![Youtube link to video demo]()](https://www.youtube.com/watch?v=UGB5BghoFMc)
+[![Youtube link to video demo](https://github.com/trochr/Nes-Tetris-Replay/blob/master/YTembed.png?raw=true)](https://www.youtube.com/watch?v=UGB5BghoFMc)
 
 
 Requirement
