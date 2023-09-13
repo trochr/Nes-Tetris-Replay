@@ -28,6 +28,7 @@ Features:
 + Display a overview of all the games recorded in the localStorage
 + Deal with local timezones
 + Sort games by lines/score/date/tag
+Blink screen on Tetris 
 Expedite playback
 Manage name so that it can be shared and imported
 have all this settings an a NES style interface
@@ -90,6 +91,11 @@ Speed seems funky on levels below 13
 /* Test games
 With 2 tetris:
 ?sl=14&r=eckksZlCEXlAYxKLUiB4KN4me4Gsh7zapXAFaHbAUqmUUgJ3qmUUkNHvRgzSxDvMkQAAAA=
+
+
+http://127.0.0.1:3000/index.html?sl=14&r=eckksZlCEXlAYxKLUiB4KN4me4Gsh7zapXAFaHbAUqmUUgJ3qmUUkNHvRgzSxDvMkQAAAA
+
+
 
 Single tuck
 ?sl=18&r=OQVks3qJrSUkkBMxkglWmQjFEEA

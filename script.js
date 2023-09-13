@@ -25,19 +25,28 @@ window.onload = function() {
     buildShapes()
     document.querySelector("#main").onclick = togglePauseGameReplay;
     document.querySelector("#speedSlider").oninput = changeSpeed;
-    slashSplitURL() // fixes issue in iOS URL detection by inserting slashes
+    let originalGame = slashSplitURL() // fixes issue in iOS URL detection by inserting slashes
     tetrisGame(getSequenceFromUrl())
-    if (localStorage.getItem("ntr")  == undefined ) {
-        initLocalStorage()
+    if (originalGame) {
+        if (localStorage.getItem("ntr")  == undefined ) {
+            initLocalStorage()
+        } else {
+            var config = JSON.parse(localStorage.getItem("ntr"))
+            if (config.username == null) {
+                config.username = prompt("Set your username", "")
+                localStorage.setItem("ntr",JSON.stringify(config))
+            }
+        }
     }
-
     saveGame()
 }
 
 function initLocalStorage () {
-    localStorage.setItem("ntr",12)
+    let ntr = {"username":null}
+    localStorage.setItem("ntr",JSON.stringify(ntr))
 }
-  
+
+
 async function sha256(text) {
 
     async function digestMessage(message) {
@@ -77,9 +86,11 @@ function slashSplitURL() {
         r=r.match(/.{1,300}/g)
         r=r.join("/")
         params.set("r",r)
+        params.set("a",JSON.parse(window.localStorage.ntr).username) // set the Author of the game
         window.location.search = decodeURIComponent(params)    
+        return true
     }
-    return
+    return false
 }
 
 function dec2bin(dec) {
@@ -794,7 +805,7 @@ function addData(db,date,url,owner,score,lines){
 
 
     transaction.addEventListener('error', (e) => { 
-        console.log("There was a transaction error") 
+        console.log("Game already registered") 
     })
 }
 
@@ -845,11 +856,16 @@ function saveStats() {
 function saveGame() {
     let db
 
+    // Checking if a local user is defined
+
+
     const openRequest =  window.indexedDB.open("NTRdb",1)
     openRequest.addEventListener('error', () => log("DbOpen failed"))
     openRequest.addEventListener('success', () => {
         db= openRequest.result;
-        addData(db,Date.now(),unSlashSplitURL(),"trochr")
+        let params = new URLSearchParams(window.location.search);
+        let author=params.get("a");    
+        addData(db,Date.now(),unSlashSplitURL(),author)
     })
 
     openRequest.addEventListener('upgradeneeded', (e) => {
@@ -1000,7 +1016,7 @@ function readFileAndImport(e) {
 function tetrisGame(gameDecoded){
 
     // Save game to local DB
-    saveGame()
+    // saveGame() // unclear why we need to save game here, we did it L34
     loadGames()
 
     //   reduceFrames(json,game)
